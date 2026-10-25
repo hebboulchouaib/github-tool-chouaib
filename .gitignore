@@ -219,8 +219,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Keep the files that came with the original repository; ignore later additions.
+# Ignore new files by default.
 /*
+# Keep the original repository files.
 !/.gitignore
 !/README.md
 !/app.py

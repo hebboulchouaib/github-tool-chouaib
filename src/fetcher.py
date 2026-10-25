@@ -57,8 +57,10 @@ class ProfileData:
 
 
 def fetch_profile(username: str, token: str | None = None) -> ProfileData:
+    """Fetch a user's public profile and summarize their owned repositories."""
     if not USERNAME_RE.fullmatch(username):
         raise ValueError(f"Invalid GitHub username: {username!r}")
+    # An explicit token takes priority; otherwise use the environment setting.
     token = token or os.environ.get("GITHUB_TOKEN")
 
     user = _call("GET", f"{API}/users/{username}", token).json()
@@ -67,6 +69,7 @@ def fetch_profile(username: str, token: str | None = None) -> ProfileData:
     repos = []
     page = 1
     while True:
+        # GitHub returns at most 100 repositories per page.
         batch = _call(
             "GET",
             f"{API}/users/{username}/repos",
@@ -78,6 +81,7 @@ def fetch_profile(username: str, token: str | None = None) -> ProfileData:
             break
         page += 1
 
+    # Exclude forks so the summary reflects repositories the user created.
     own_repos = [repo for repo in repos if not repo["fork"]]
     languages = Counter(repo["language"] for repo in own_repos if repo["language"])
     topics = Counter(t for repo in own_repos for t in repo.get("topics") or [])
@@ -85,6 +89,7 @@ def fetch_profile(username: str, token: str | None = None) -> ProfileData:
     total_commits = None
     external_repos = None
     if token:
+        # These contribution totals require authenticated GraphQL requests.
         total_commits = _count_commits(username, created_at.year, token)
         data = _graphql(EXTERNAL_REPOS_QUERY, {"login": username}, token)
         external_repos = data["repositoriesContributedTo"]["totalCount"]
@@ -104,6 +109,7 @@ def fetch_profile(username: str, token: str | None = None) -> ProfileData:
 
 
 def _count_commits(username: str, first_year: int, token: str) -> int:
+    # Query one calendar year at a time, ending the current year at today's date.
     now = datetime.now(UTC)
     total = 0
     for year in range(first_year, now.year + 1):
@@ -118,6 +124,7 @@ def _count_commits(username: str, first_year: int, token: str) -> int:
 
 
 def _graphql(query: str, variables: dict, token: str) -> dict:
+    # Return the user's data, converting GraphQL errors into app-level exceptions.
     body = _call(
         "POST", GRAPHQL_URL, token, json={"query": query, "variables": variables}
     ).json()
@@ -130,6 +137,7 @@ def _graphql(query: str, variables: dict, token: str) -> dict:
 
 
 def _call(method: str, url: str, token: str | None, **kwargs) -> httpx.Response:
+    # Share headers, timeout, and HTTP error handling across REST and GraphQL calls.
     headers = {"Accept": "application/vnd.github+json"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
