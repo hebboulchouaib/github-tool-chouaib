@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Keep the files that came with the original repository; ignore later additions.
+/*
+!/.gitignore
+!/README.md
+!/app.py
+!/requirment.txt
+!/src/
+!/src/evaluator.py
+!/src/fetcher.py
+!/src/pipeline.py
+!github
