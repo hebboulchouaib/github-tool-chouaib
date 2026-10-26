@@ -19,10 +19,17 @@ class ProfileData:
 
 def account_older_than_year(data):
     now = datetime.now(timezone.utc)
-    return (now - data.created_at).days > 365
+    created_at = data.created_at
+
+ 
+    if created_at.tzinfo is None:
+        created_at = created_at.replace(tzinfo=timezone.utc)
+
+    return (now - created_at).days > 365
 
 
-def evalulate_profile(data):
+
+def evaluate_profile(data):
     profile_score = 0
 
     # Check followers
@@ -61,7 +68,7 @@ def evalulate_profile(data):
         5, data.external_repos_contributed_to // 3
     )
 
-    return profile_score
+    return profile_score, account_older_than_year(data)
 
 
 def check_lang(data):
@@ -73,12 +80,13 @@ def lang_score(languages):
     score = 0
 
     for lang, count in languages.items():
-    # get the lang he used a lot this mean he good at it 
+        # languages used a lot (more than 2 repos) count as strong languages
         if count > 2:
             power_lang.add(lang)
             score += 1
 
     return score, power_lang
+
 
 '''
 def activity_score(repos):
@@ -108,7 +116,7 @@ def activity_score(repos):
             score += 1
 
     return score
-    
+
 '''
 
 # Test profile
@@ -129,7 +137,7 @@ profile = ProfileData(
     external_repos_contributed_to=7,
 )
 
-score = evalulate_profile(profile)
+score, account_age = evaluate_profile(profile)
 languages = check_lang(profile)
 language_points, power_lang = lang_score(languages)
 
@@ -138,10 +146,14 @@ print("Username:", profile.username)
 print("Profile score:", score, "/20 .")
 if score >= 10:
     print("Result : ACCEPTED .")
-elif score > 5 & score <10:
+elif 5 < score < 10:
     print("Result : NEED REVIEW .")
 else:
     print("Result : REJECTED")
-print("num commit : ",profile.total_commits )
+
+print("num commit : ", profile.total_commits)
+print("account-age : ", account_age)
 print("Languages:", languages)
 print("Strong languages:", power_lang)
+
+
