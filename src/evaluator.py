@@ -152,7 +152,7 @@ else:
     print("Result : REJECTED")
 
 print("num commit : ", profile.total_commits)
-print("account-age : ", account_age)
+print("Account-age > 1 Year : ", account_age)
 print("Languages:", languages)
 print("Strong languages:", power_lang)
 
