@@ -50,7 +50,7 @@ def process_user(username, requirements, required_languages=None, token=None):
     result = evaluate(profile, requirements, required_languages)
     result["error"] = None
     return result
-
+#check if still needed with ilyes
 def read_entries(text=None, file=None):
     entries = []
 
@@ -91,7 +91,7 @@ def clean_usernames(entries):
 
     return usernames, invalid
     
-def run_pipeline(entries, requirements, required_languages=None, token=None):
+def main_pipeline(entries, requirements, required_languages=None, token=None):
     
     if not requirements and not required_languages:
         raise ValueError("Select at least one requirement")
