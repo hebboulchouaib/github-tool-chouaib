@@ -91,7 +91,18 @@ def clean_usernames(entries):
 
     return usernames, invalid
     
-entries = read_entries(text="octocat, https://github.com/torvalds/\ngithub.com/gaearon  octocat")
-print(clean_usernames(entries))
-entries = read_entries(file="data/sample_users.csv")
-print(clean_usernames(entries))
+def run_pipeline(entries, requirements, required_languages=None, token=None):
+    
+    if not requirements and not required_languages:
+        raise ValueError("Select at least one requirement")
+
+    usernames, invalid = clean_usernames(entries)
+
+    results = []
+    for username in usernames:
+        results.append(process_user(username, requirements, required_languages, token))
+
+    for entry in invalid:
+        results.append(error_result(entry, "Not a valid GitHub link or username"))
+
+    return results
