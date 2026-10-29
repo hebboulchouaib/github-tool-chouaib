@@ -1,5 +1,13 @@
-import evaluator
 from urllib.parse import urlparse
+import re
+import pandas as pd
+from src.evaluator import evaluate
+from src.fetcher import (
+    GitHubError,
+    RateLimitError,
+    UserNotFoundError,
+    fetch_profile,
+)
 
 
 def extract_username(text):
@@ -19,26 +27,71 @@ def extract_username(text):
     parts = [p for p in parsed.path.split("/") if p]
     return parts[0] if parts else None
 
-def get_input():
 
-    source = input("Enter the GitHub profile URL: ")
+def error_result(username, message):
+    return {
+        "username": username, "score": None, "level": None,
+        "decision": None, "error": message,
+    }
 
-    source = extract_username
-    if not source :
-        print("unavalible url")
-    else :    
-       print("\nChoose the criteria to evaluate:")
-       print("1. Number of public repositories")
-       print("2. Number of followers")
-       print("3. Account age")
-       print("4. Programming languages")
-       print("5. Recent activity")
 
-       selected = input("Enter criteria numbers separated by commas: ")
+def process_user(username, requirements, required_languages=None, token=None):
+    try:
+        profile = fetch_profile(username, token)
+    except UserNotFoundError:
+        return error_result(username, "User not found")
+    except RateLimitError:
+        return error_result(username, "GitHub rate limit reached, use a token or retry later")
+    except GitHubError as error:
+        return error_result(username, f"GitHub error: {error}")
+    except ValueError:
+        return error_result(username, "Invalid username")
 
-       criteria = selected.split(",")
-       print("Selected criteria:", criteria)
+    result = evaluate(profile, requirements, required_languages)
+    result["error"] = None
+    return result
 
-    return source, criteria
+def read_entries(text=None, file=None):
+    entries = []
 
-# print(get_input())
+    if text:
+        entries += [e for e in re.split(r"[\s,;]+", text) if e]
+
+    if file is not None:
+        name = str(getattr(file, "name", file)).lower()
+        if name.endswith(".csv"):
+            table = pd.read_csv(file)
+        elif name.endswith((".xlsx", ".xls")):
+            table = pd.read_excel(file)
+        else:
+            raise ValueError("Unsupported file type, use .csv or .xlsx")
+
+        column = table.columns[0]
+        for candidate in table.columns:
+            if str(candidate).strip().lower() in ("username", "link", "url", "github"):
+                column = candidate
+                break
+        entries += [str(v).strip() for v in table[column].dropna() if str(v).strip()]
+
+    return entries
+
+
+def clean_usernames(entries):
+    usernames = []
+    invalid = []
+    seen = set()
+
+    for entry in entries:
+        username = extract_username(entry)
+        if username is None:
+            invalid.append(entry)
+        elif username.lower() not in seen:
+            seen.add(username.lower())
+            usernames.append(username)
+
+    return usernames, invalid
+    
+entries = read_entries(text="octocat, https://github.com/torvalds/\ngithub.com/gaearon  octocat")
+print(clean_usernames(entries))
+entries = read_entries(file="data/sample_users.csv")
+print(clean_usernames(entries))

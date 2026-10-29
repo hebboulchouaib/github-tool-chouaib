@@ -1,6 +1,6 @@
 
 from datetime import datetime, timezone
-from fetcher import *
+from src.fetcher import *
 
 CLOSE_RATIO = 0.8
 
@@ -19,7 +19,6 @@ def lang_score(languages):
     score = 0
 
     for lang, count in languages.items():
-        # languages used a lot (more than 2 repos) count as strong languages
         if count > 2:
             power_lang.add(lang)
             score += 1
@@ -152,8 +151,6 @@ def get_level(score):
 
 
 def evaluate(data, requirements, required_languages=None):
-    """The one function the pipeline calls. Returns a dictionary with
-    the score, level, decision and the lines for the review field."""
     score, breakdown = evaluate_profile(data)
 
     measurable = 0
@@ -202,19 +199,19 @@ def evaluate(data, requirements, required_languages=None):
 # print(decide(profile, {"commits": 1000})[0])
 # print(decide(profile, {"followers": 10}, ["Python", "Rust"])[0])
 # print(decide(profile, {"followers": 10}, ["python", "go"])[0])
-no_token = ProfileData(
-    username="lmcouli",
-    name="The Mcouli",
-    created_at=datetime(2011, 1, 25, 18, 44, 36, tzinfo=timezone.utc),
-    followers=1000,
-    public_repos=8,
-    repos_analyzed=6,
-    languages={"Python": 3, "C": 1, "Go": 1},
-    topics={"cli": 2, "api": 1},
-    total_commits=None,
-    external_repos_contributed_to=None,
-)
+# no_token = ProfileData(
+#     username="lmcouli",
+#     name="The Mcouli",
+#     created_at=datetime(2011, 1, 25, 18, 44, 36, tzinfo=timezone.utc),
+#     followers=1000,
+#     public_repos=8,
+#     repos_analyzed=6,
+#     languages={"Python": 3, "C": 1, "Go": 1},
+#     topics={"cli": 2, "api": 1},
+#     total_commits=None,
+#     external_repos_contributed_to=None,
+# )
 
-print(decide(no_token, {"commits": 100})[0])
-result = evaluate(no_token, {"followers": 10})
-print(result["score"], result["level"], result["decision"])
+# print(decide(no_token, {"commits": 100})[0])
+# result = evaluate(no_token, {"followers": 10})
+# print(result["score"], result["level"], result["decision"])
