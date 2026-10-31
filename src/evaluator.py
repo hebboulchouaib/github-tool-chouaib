@@ -2,6 +2,8 @@
 from datetime import datetime, timezone
 
 CLOSE_RATIO = 0.8
+ACCEPT_SCORE = 10 
+REVIEW_SCORE = 6
 
 def account_age_years(data):
     created_at = data.created_at
@@ -79,15 +81,17 @@ def percent_reached(value, required):
 
 
 def evaluate(data, requirements, required_languages=None):
-    decision, checks = decide(data, requirements, required_languages)
+    _, checks = decide(data, requirements, required_languages)
 
-    review = []   
-    reached = []  
+    review = []
+    reached = []
+    language_missing = False
     for name, value, required, result in checks:
         if name == "languages":
-            pct = None 
+            pct = None  # never part of the score
+            language_missing = (result == "rejected")
         elif required <= 0:
-            continue    
+            continue    # slider left at 0: ignored everywhere
         else:
             pct = percent_reached(value, required)
             if pct is not None:
@@ -101,6 +105,15 @@ def evaluate(data, requirements, required_languages=None):
         score = None
         level = "Not scored"
 
+    if language_missing:
+        decision = "REJECTED"
+    elif score is None or score >= ACCEPT_SCORE:
+        decision = "ACCEPTED"
+    elif score >= REVIEW_SCORE:
+        decision = "NEED REVIEW"
+    else:
+        decision = "REJECTED"
+
     return {
         "username": data.username,
         "score": score,
@@ -108,47 +121,3 @@ def evaluate(data, requirements, required_languages=None):
         "decision": decision,
         "review": review,
     }
-
-#test 
-# profile = ProfileData(
-#         username="lmcouli",
-#         name="The Mcouli",
-#         created_at=datetime(2011, 1, 25, 18, 44, 36, tzinfo=timezone.utc),
-#         followers=1000,
-#         public_repos=8,
-#         repos_analyzed=6,
-#         languages={"Python": 3, "C": 1, "Go": 1},
-#         topics={"cli": 2, "api": 1},
-#         total_commits=412,
-#         external_repos_contributed_to=7,
-#     )
-# requ={
-#      "followers": 2000,
-#      "repos": 400,
-#      "account_age": 3,
-#      "commits": 40,
-#      "topics": 4,
-#      "external": 10
-# }
-
-# print(decide(profile, {"followers": 10, "commits": 100}))
-# print(decide(profile, {"commits": 450})[0])
-# print(decide(profile, {"commits": 1000})[0])
-# print(decide(profile, {"followers": 10}, ["Python", "Rust"])[0])
-# print(decide(profile, {"followers": 10}, ["python", "go"])[0])
-# no_token = ProfileData(
-#     username="lmcouli",
-#     name="The Mcouli",
-#     created_at=datetime(2011, 1, 25, 18, 44, 36, tzinfo=timezone.utc),
-#     followers=1000,
-#     public_repos=8,
-#     repos_analyzed=6,
-#     languages={"Python": 3, "C": 1, "Go": 1},
-#     topics={"cli": 2, "api": 1},
-#     total_commits=None,
-#     external_repos_contributed_to=None,
-# )
-
-# print(decide(no_token, {"commits": 100})[0])
-# result = evaluate(no_token, {"followers": 10})
-# print(result["score"], result["level"], result["decision"])
