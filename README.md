@@ -34,7 +34,6 @@
 - [GitHub API & Authentication](#-github-api--authentication)
 - [Configuration Reference](#-configuration-reference)
 - [Testing](#-testing)
-- [Team](#-team)
 
 ---
 
@@ -350,16 +349,5 @@ PYTHONPATH=src pytest tests/ -v
 - Rate limit → `RateLimitError` with reset time
 - No-token mode (GraphQL fields are `None`)
 - Commit summation across yearly windows
-
----
-
-## 👥 Team
-
-| Member                | Role                                   |
-| --------------------- | -------------------------------------- |
-| **Chouaib**           | Data Fetching Layer & API Integration  |
-| **Rayan**             | Evaluation Engine & Scoring Logic      |
-| **Mehdi**             | Pipeline Orchestration & Input Parsing |
-| **Mohamed (Kiotaka)** | Streamlit UI & User Experience         |
 
 ---
