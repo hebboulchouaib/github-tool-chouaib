@@ -88,10 +88,10 @@ def evaluate(data, requirements, required_languages=None):
     language_missing = False
     for name, value, required, result in checks:
         if name == "languages":
-            pct = None  # never part of the score
+            pct = None  
             language_missing = (result == "rejected")
         elif required <= 0:
-            continue    # slider left at 0: ignored everywhere
+            continue    
         else:
             pct = percent_reached(value, required)
             if pct is not None:
