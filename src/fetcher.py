@@ -9,7 +9,6 @@ import httpx
 API = "https://api.github.com"
 GRAPHQL_URL = f"{API}/graphql"
 USERNAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}")
-
 COMMITS_QUERY = """
 query($login: String!, $from: DateTime!, $to: DateTime!) {
   user(login: $login) {
