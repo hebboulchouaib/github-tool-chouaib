@@ -34,7 +34,6 @@
 - [GitHub API & Authentication](#-github-api--authentication)
 - [Configuration Reference](#-configuration-reference)
 - [Testing](#-testing)
-- [Contributing](#-contributing)
 - [Team](#-team)
 
 ---
