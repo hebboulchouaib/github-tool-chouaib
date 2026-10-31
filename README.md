@@ -7,8 +7,6 @@
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.x-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![GitHub API](https://img.shields.io/badge/GitHub%20API-v3%20%2B%20GraphQL-181717?logo=github&logoColor=white)](https://docs.github.com/en/rest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
 ---
 
 *Built by **Chouaib**, **Rayan**, **Mehdi**, and **Mohamed**
