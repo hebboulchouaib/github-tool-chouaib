@@ -1,7 +1,7 @@
 import streamlit as st
 from src.pipeline import main_pipeline, read_entries
 
-LANGUAGES=["Python","JavaScript","TypeScript","Java","C","C++","C#","PHP", "Go","Rust", "Kotlin", "Swift","SQL","Ruby","Dart"]
+LANGUAGES=["Python","html","css","JavaScript","TypeScript","Java","C","C++","C#","PHP", "Go","Rust", "Kotlin", "Swift","SQL","Ruby","Dart"]
 
 CRITERIA = {
     "repos": ("Minimum public repos", 100),
