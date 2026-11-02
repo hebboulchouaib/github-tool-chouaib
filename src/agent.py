@@ -219,8 +219,3 @@ def ask_agent(history, message, results=None):
     if actions and not reply:
         reply = " ".join(describe(a) for a in actions)
     return reply or "Sorry, I didn't get that. Try describing what you want.", actions
-        "show only people named ali",
-        "show me everyone again",
-    ]:
-        reply, actions = ask_agent([], text, fake)
-        print(text, "\n  ->", reply, actions, "\n")
