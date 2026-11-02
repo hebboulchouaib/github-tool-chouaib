@@ -69,7 +69,6 @@ SYSTEM = (
 
 
 def clean_criteria(args):
-    """Keep only known criteria, as integers inside the slider range."""
     values = {}
     for name, (label, maximum) in CRITERIA.items():
         if name in args:
