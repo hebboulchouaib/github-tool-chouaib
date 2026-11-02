@@ -2,3 +2,4 @@ streamlit
 pandas
 httpx
 openpyxl
+google-genai
