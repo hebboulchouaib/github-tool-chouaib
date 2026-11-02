@@ -3,7 +3,7 @@ from google.genai import types
 from google.genai.errors import APIError
 from src.settings import CRITERIA, LANGUAGES
 
-MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash"] 
+MODELS = ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"] 
 DECISIONS = ["ACCEPTED", "NEED REVIEW", "REJECTED"]
 
 SET_CRITERIA = {
