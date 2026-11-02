@@ -86,7 +86,6 @@ def clean_criteria(args):
 
 
 def clean_filter(args):
-    """Keep only valid filter fields."""
     flt = {}
     decisions = [d for d in (args.get("decisions") or []) if d in DECISIONS]
     if decisions:
@@ -104,7 +103,6 @@ def clean_filter(args):
 
 
 def apply_filter(results, flt):
-    """The rows that match the filter (an empty filter keeps everything)."""
     shown = []
     for r in results:
         if "username" in flt and flt["username"] not in r["username"].lower():
@@ -133,7 +131,6 @@ def describe_filter(flt):
 
 
 def describe(action):
-    """Confirmation text written by our code from the validated action."""
     if action["type"] == "reset":
         if action["scope"] == "all":
             return "Done. All minimums are back to 0 and no language is required."
@@ -151,7 +148,6 @@ def describe(action):
 
 
 def summarize(results, limit=30):
-    """Compact text version of the results, so the model can answer questions."""
     lines = []
     for r in results[:limit]:
         name = str(r["username"])[:40]
@@ -170,7 +166,6 @@ def summarize(results, limit=30):
 
 
 def reply_text(response):
-    """Text of the reply, read from the text parts only (no SDK warning)."""
     if not response.candidates or not response.candidates[0].content:
         return ""
     parts = response.candidates[0].content.parts or []
@@ -178,7 +173,7 @@ def reply_text(response):
 
 
 def ask_agent(history, message, results=None):
-    client = genai.Client()  # reads the GEMINI_API_KEY environment variable
+    client = genai.Client()  # reads the GEMINI API KEY environment variable
     contents = [types.Content(role=h["role"], parts=[types.Part(text=h["text"])])
                 for h in history]
     contents.append(types.Content(role="user", parts=[types.Part(text=message)]))
@@ -225,34 +220,6 @@ def ask_agent(history, message, results=None):
     if actions and not reply:
         reply = " ".join(describe(a) for a in actions)
     return reply or "Sorry, I didn't get that. Try describing what you want.", actions
-
-
-if __name__ == "__main__":
-    fake = [
-        {"username": "alice", "score": 15, "level": "Good", "decision": "ACCEPTED", "error": None,
-         "review": [("repos", 8, 5, 1.0, "accepted"), ("followers", 5, 10, 0.5, "rejected")]},
-        {"username": "bob", "score": 7, "level": "Below average", "decision": "REJECTED", "error": None,
-         "review": [("repos", 2, 5, 0.4, "rejected"), ("followers", 3, 10, 0.3, "rejected"),
-                    ("languages", ["Go"], ["Rust"], None, "rejected")]},
-        {"username": "carol", "score": 8, "level": "Below average", "decision": "NEED REVIEW", "error": None,
-         "review": [("repos", 2, 5, 0.4, "rejected"), ("followers", 4, 10, 0.4, "rejected")]},
-        {"username": "not a user", "score": None, "level": None, "decision": None,
-         "error": "Not a valid GitHub link or username", "review": None},
-    ]
-
-    # no API request: the filter logic
-    print([r["username"] for r in apply_filter(fake, {"decisions": ["ACCEPTED", "NEED REVIEW"]})])
-    print([r["username"] for r in apply_filter(fake, {"min_score": 8})])
-    print([r["username"] for r in apply_filter(fake, {"username": "al"})])
-    print([r["username"] for r in apply_filter(fake, {"max_score": 7})])
-    print(len(apply_filter(fake, {})))
-
-    
-    for text in [
-        "show only the accepted ones",
-        "who has a score above 10?",
-        "why was bob rejected?",
-        "which one needs a human to look at it, and why?",
         "show only people named ali",
         "show me everyone again",
     ]:
